@@ -47,9 +47,7 @@
              :modulo   "I LET HIM GO"
              :end-main "YOU HAVE BEEN TERMINATED"})
             
-;;;NOTE apostrophe was causing issues.. hard coded it to make grammer work, not elegant
-;;;refactor and fix it
-  
+
 (def arnold-grammer 
  (str "Program = method-declaration* begin-main wspace  method-declaration*;
        begin-main = <'" (:begin-main tokens) "'> (statement wspace)* end-main ;"
@@ -61,7 +59,6 @@
       "call-method = <'"(:call-method tokens)"'> wspace  method-name  numvar* wspace;"
       "method-name = (number| #'[a-zA-Z][a-zA-Z0-9]*' |zero |false | true) "
       "assign-var-from-method-call = <'" (:assign-var-from-method-call tokens)"'> wspace variable wspace call-method;"
-      ;assignment can have operations within it  problem is that repeaded arithmetics are not the same
       "assignment = <'"(:assignment tokens)"'> numvar wspace set-val wspace end-assignment wspace;
        while= <'" (:while tokens) "'> numvar wspace statement* end-while ;
        <end-while>= <'" (:end-while tokens) "'>;
