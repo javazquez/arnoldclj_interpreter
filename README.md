@@ -1,7 +1,7 @@
 # arnoldclj_s
 This project uses [Clojure](https://clojure.org/)
 
-The project uses [Midje](https://github.com/marick/Midje/).
+This project uses [Midje](https://github.com/marick/Midje/).
 
 This project also uses[Instaparse](https://github.com/Engelberg/instaparse)
 
