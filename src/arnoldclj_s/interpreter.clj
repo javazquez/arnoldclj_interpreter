@@ -182,7 +182,6 @@
         name-prefix (gensym (str method-name "-"))
         { meth-args true statements false } (group-by #(= :method-arg (first %)) method)
         new-meth-args (map (fn [meth-arg] (str name-prefix (run meth-arg))) meth-args) 
-                                        ;move this to declaration
         arg-values (map (fn [arg] (check-table (run arg))) args)
         arg-pairs (partition 2 (interleave new-meth-args arg-values))
         method-stats (transform-method-variables name-prefix statements)]
