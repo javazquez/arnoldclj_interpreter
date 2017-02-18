@@ -48,7 +48,7 @@
              :end-main "YOU HAVE BEEN TERMINATED"})
             
 
-(def arnold-grammer 
+(def arnold-grammar 
  (str "Program = method-declaration* begin-main wspace  method-declaration*;
        begin-main = <'" (:begin-main tokens) "'> (statement wspace)* end-main ;"
       "<wspace> = <#'\\s*'>;"
@@ -102,7 +102,7 @@
 
 
 (def arnoldc
- (insta/parser arnold-grammer)) 
+ (insta/parser arnold-grammar)) 
 
 ;http://stackoverflow.com/questions/26338945/how-to-test-for-texts-not-fitting-an-instaparse-grammar-clojure
 ; pretty-print a failure as a string
