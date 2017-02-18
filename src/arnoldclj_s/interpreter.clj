@@ -22,14 +22,15 @@
 
 (defn run-statements [ [statement & statements :as all-stats]]
   "runs statements until a return is found"
-  (if (= :call-method statement) (run all-stats)
-      (let [return-val (run statement)]
-        (if (or (and (map? return-val) (contains? return-val :return))
-                (empty? statements) 
-              (empty? statement)
-              (= return-val :nothing))
-          return-val
-          (recur statements)))))
+  (if (= :call-method statement)
+    (run all-stats) ;dispatch to the call-method
+    (let [return-val (run statement)]
+      (if (or (and (map? return-val)
+                   (contains? return-val :return))
+              (empty? statements) 
+              (empty? statement))
+        return-val
+        (recur statements)))))
 
 (defmethod run :Program [[e  & rest :as statements]]
   (let [ {[bmain] true method-des false} (group-by #(= :begin-main (first %)) rest)]
@@ -39,22 +40,20 @@
       (catch Exception e (throw e))
       (finally
         (reset! symbol-table {})))))
-                 
 
 (defmethod run :begin-main [[e statement & rest]]
   (run statement)
-  (if-not (= statement [:statement [:return]])
-    (run-statements rest)))
+  (run-statements rest))
 
 (defmethod run :statement [[s statement]]
   (if (= (nth statement 0) :assign-var-from-method-call)
-    (do
-      (set-value (nth (nth statement 1) 1)
-                 (run (nth statement 2))))
+    (set-value (nth (nth statement 1) 1)
+               (run (nth statement 2)))
     (run statement)))
 
 (defmethod run :assignment [[e [_variable var] val]]
-  (set-value var (run val))
+  (set-value var
+             (run val))
   {(keyword var) (check-table var)})
 
 (defn choose-op [kword]
@@ -105,11 +104,11 @@
         (recur ( (case arith-key
                    :logical-op (choose-logic-op operator)
                    :arithmetic-op (choose-op operator)) 
-                 operand 
-                 (run varnum-node)) 
+                operand 
+                (run varnum-node)) 
                rest))
       operand)))
- 
+
 
 (defmethod run :set-val [[sv statement & rest]]
   (arithmetic-helper (run statement) rest))  
@@ -121,7 +120,8 @@
   (if (contains? @symbol-table (keyword (nth var 1)))
     (throw (Exception. 
             (str  "WHAT THE FUCK DID I DO WRONG? You made duplicate variable declarations '" var "'")))  
-    (set-value (nth var 1) (run  val))))
+    (set-value (nth var 1)
+               (run  val))))
 
 (defmethod run :while [[e  truthy & statements]]
   (loop [stats statements]
@@ -129,22 +129,28 @@
       (do
         (run-statements stats)
         (recur stats)))))
-   
+
 (defmethod run :zero [[e val]] 0)
 
 ;the variable is declared here, and will be assigned in subsequent calls
 (defmethod run :assign-var-from-method-call [[e variable method-call]] 
-  (set-value (run variable) (:return (run-statements method-call))))
+  (set-value (run variable)
+             (:return (run-statements method-call))))
 
-(defmethod run :default [[x]] [])
+(defmethod run :default [[x]]
+  [])
 
-(defmethod run :init-val [[e val ]] (run val))
+(defmethod run :init-val [[e val ]]
+  (run val))
 
-(defmethod run :bool [[e val ]] (run val))
+(defmethod run :bool [[e val ]]
+  (run val))
 
-(defmethod run :true [[e val]] 1)
+(defmethod run :true [[e val]]
+  1)
 
-(defmethod run :false [[e val]] 0)
+(defmethod run :false [[e val]]
+  0)
 
 (defmethod run :number [[e val]] 
   (read-string val))
@@ -156,13 +162,14 @@
 (defmethod run :method-name [[e name]] 
   (check-table name)) 
 
-(defmethod run :quotedstring [[e val]] val)
+(defmethod run :quotedstring [[e val]]
+  val)
 
 (defmethod run :method-statement [[ms statement]] 
   (run statement))
 
 (defn transform-method-variables [name-prefix statements ]
-  (map #(w/postwalk (fn [node] ;move this to declaration
+  (map #(w/postwalk (fn [node]
                       (if (and 
                            (vector? node)
                            (= (first node) :variable))
@@ -171,10 +178,10 @@
 
 ;;TODO create a key deleting service using the method name as a prefix!!!
 (defn remove-method-vars [method-name] 
-   "function will remove the temp variable declared in a method after the method has returned"
-   (remove (fn [item] 
-             (re-find (re-pattern (str "^" method-name "-") (key item))))
-           @symbol-table))
+  "function will remove the temp variable declared in a method after the method has returned"
+  (remove (fn [item] 
+            (re-find (re-pattern (str "^" method-name "-") (key item))))
+          @symbol-table))
 
 (defmethod run :call-method [[e name-node & args]]
   (let [method-name (nth name-node 1)
@@ -188,12 +195,11 @@
     (if args
       (do
         (run! (fn [[var value] ] 
-                (set-value var value))
+                (set-value var
+                           value))
               arg-pairs) 
-        (let [ return-val (run-statements method-stats)]
-          return-val))          
+        (run-statements method-stats))          
       (run-statements statements)))) 
-
 
 (defmethod run :method-declaration [[e varname-node & rest]] 
   (set-value (run varname-node)
@@ -209,10 +215,7 @@
   {:return (run varname)})
 
 (defmethod run :return [[e varname]]
-  (let [ ret (if (nil? varname)
-               {:return :nothing}
-               {:return (run varname)})]
-    ret))
+  {:return (run varname)})
 
 (defmethod run :if [[e truthy & statements]]
   (let [ [else-statements if-statements]  ((juxt filter remove) #(= :else-if (first %)) statements)]
