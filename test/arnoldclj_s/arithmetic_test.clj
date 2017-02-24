@@ -40,7 +40,7 @@
    [:printing 
     [:number "-111"]]]]])
 
-;have to call run on rest.. recursive is missing
+
 (fact "evaluate when a 'boolean' is printed"
    (lights-camera-action
     "IT'S SHOWTIME
@@ -116,7 +116,6 @@
 ) 
 
 
- ;fixme spaces after variables are not working     
 (fact "evaluate when a negative integer is declared and printed"
   (lights-camera-action "IT'S SHOWTIME
                          HEY CHRISTMAS TREE a\n
