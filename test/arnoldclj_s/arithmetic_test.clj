@@ -806,29 +806,7 @@
     [:variable "VAR"]]]]]
 )
       
-;FIXME this should produce an error
-(fact "detect duplicate variable declarations"
-   (lights-camera-action "IT'S SHOWTIME 
-                          HEY CHRISTMAS TREE VAR 
-                          YOU SET US UP 22 
-                          HEY CHRISTMAS TREE VAR 
-                          YOU SET US UP 22 
-                          YOU HAVE BEEN TERMINATED") =>
-[:Program 
- [:begin-main 
-  [:statement 
-   [:decvar 
-    [:variable "VAR"] 
-    [:init-val 
-     [:number "22"]]]] 
-  [:statement 
-   [:decvar 
-    [:variable "VAR"] 
-    [:init-val 
-     [:number "22"]]]]]]
- )
 
- ; FIXME throws a parse error and is expected     
 (fact "detect faulty variable names"  
   (with-out-str (lights-camera-action  "IT'S SHOWTIME 
                           HEY CHRISTMAS TREE 1VAR 

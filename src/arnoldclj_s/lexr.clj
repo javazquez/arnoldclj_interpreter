@@ -48,7 +48,8 @@
              :end-main "YOU HAVE BEEN TERMINATED"})
             
 
-(def arnold-grammar 
+(defn arnold-grammar [tokens]
+"create the arnoldc grammer using the tokens map that is passed in"
  (str "Program = method-declaration* begin-main wspace  method-declaration*;
        begin-main = <'" (:begin-main tokens) "'> (statement wspace)* end-main ;"
       "<wspace> = <#'\\s*'>;"
@@ -102,7 +103,7 @@
 
 
 (def arnoldc
- (insta/parser arnold-grammar)) 
+  (insta/parser (arnold-grammar tokens))) 
 
 ;http://stackoverflow.com/questions/26338945/how-to-test-for-texts-not-fitting-an-instaparse-grammar-clojure
 ; pretty-print a failure as a string
@@ -113,18 +114,14 @@
 (defn- failure->exn [result]
   (Exception. (failure->string result)))  
 
-(defn parser [expr]
-  (let [result (arnoldc expr)]
+(defn parser [lexr expr]
+  (let [result (lexr expr)]
     (if (insta/failure? result)
       (throw (failure->exn result))
       result)))
 
-(defn formatter [expr]
-  (->> (parser expr)
-       (insta/transform transform-ops)) )
-
 (defn lights-camera-action [& expr]
-  (try (->> (parser (clojure.string/join expr))
+  (try (->> (parser arnoldc (clojure.string/join expr))
             (insta/transform transform-ops))
        (catch Exception e 
          (throw (Exception.  (str "WHAT THE FUCK DID I DO WRONG? \n" (.getMessage e)))))))
