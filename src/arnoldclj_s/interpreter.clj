@@ -132,7 +132,7 @@
 
 (defmethod run :zero [[e val]] 0)
 
-;the variable is declared here, and will be assigned in subsequent calls
+
 (defmethod run :assign-var-from-method-call [[e variable method-call]] 
   (set-value (run variable)
              (:return (run-statements method-call))))
@@ -175,13 +175,6 @@
                            (= (first node) :variable))
                         [:variable (str name-prefix (second node))]
                         node)) % ) statements))
-
-;;TODO create a key deleting service using the method name as a prefix!!!
-(defn remove-method-vars [method-name] 
-  "function will remove the temp variable declared in a method after the method has returned"
-  (remove (fn [item] 
-            (re-find (re-pattern (str "^" method-name "-") (key item))))
-          @symbol-table))
 
 (defmethod run :call-method [[e name-node & args]]
   (let [method-name (nth name-node 1)
