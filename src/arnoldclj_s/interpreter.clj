@@ -20,8 +20,9 @@
 
 (defmulti run (fn [s] (nth s 0)))
 
-(defn run-statements [ [statement & statements :as all-stats]]
+(defn run-statements 
   "runs statements until a return is found"
+  [ [statement & statements :as all-stats]]
   (if (= :call-method statement)
     (run all-stats) ;dispatch to the call-method
     (let [return-val (run statement)]
@@ -64,14 +65,16 @@
     :modulo rem
     :div quot)) 
 
-(defn bool->digit [value]
+(defn bool->digit 
   "convert clojure true/false to arnoldc true/fale, which is 1 or 0"
+  [value]
   (if (= value true)
     1
     0))
 
-(defn digit->bool [value]
+(defn digit->bool 
   "convert arnoldc true = 1 and false = 0 to clojure true/false"
+  [value]
   (if (zero? value)
     false
     true))

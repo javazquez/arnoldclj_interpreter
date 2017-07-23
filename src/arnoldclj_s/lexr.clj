@@ -48,8 +48,9 @@
              :end-main "YOU HAVE BEEN TERMINATED"})
             
 
-(defn arnold-grammar [tokens]
-"create the arnoldc grammer using the tokens map that is passed in"
+(defn arnold-grammar 
+  "create the arnoldc grammer using the tokens map that is passed in"
+  [tokens]
  (str "Program = method-declaration* begin-main wspace  method-declaration*;
        begin-main = <'" (:begin-main tokens) "'> (statement wspace)* end-main ;"
       "<wspace> = <#'\\s*'>;"
